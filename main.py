@@ -1,11 +1,20 @@
 from fastapi import FastAPI, HTTPException
+from enum import Enum
 
 app = FastAPI()
+
+
+class GenreURLChoices(Enum):
+    ROCK = 'rock'
+    ELECTRONIC = 'electronic'
+    METAL = 'metal'
+    HIP_HOP = 'hip-hop'
+
 
 Bands = [
     {'id': 1, 'name': 'The Kinks', 'genre': 'Rock'},
     {'id': 2, 'name': 'Aphex Twin', 'genre': 'Electronic'},
-    {'id': 3, 'name': 'Slowdive', 'genre': 'Shoegaze'},
+    {'id': 3, 'name': 'Pantera', 'genre': 'Metal'},
     {'id': 4, 'name': 'Wu-Tang Clan', 'genre': 'Hip-Hop'},
 ]
 
@@ -22,7 +31,7 @@ async def band(band_id: int) -> dict:
     return band
 
 @app.get('/bands/genre/{genre}', status_code=200)
-async def band_for_genre(genre: str) -> list[dict]:
+async def band_for_genre(genre: GenreURLChoices) -> list[dict]:
     return [
-        b for b in Bands if b['genre'].lower() == genre.lower()
+        b for b in Bands if b['genre'].lower() == genre.value
     ]  
