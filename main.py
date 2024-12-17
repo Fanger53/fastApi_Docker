@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from schema import GenreURLChoices, Band, BandBase, BandCreate, BandWithId
+from schema import GenreURLChoices, Band, BandCreate, BandWithId
 
 app = FastAPI()
 
@@ -11,6 +11,7 @@ Bands = [
     {'id': 4, 'name': 'Wu-Tang Clan', 'genre': 'Hip-Hop'},
 ]
 
+
 @app.get('/bands')
 async def bands(genre: GenreURLChoices | None = None) -> list[Band]:
     band_list = [Band(**b) for b in Bands]
@@ -20,6 +21,7 @@ async def bands(genre: GenreURLChoices | None = None) -> list[Band]:
         ]
     return band_list
 
+
 @app.get('/bands/{band_id}', status_code=200)
 async def band(band_id: int) -> BandWithId:
     band = next((BandWithId(**b) for b in Bands if b['id'] == band_id), None)
@@ -28,11 +30,12 @@ async def band(band_id: int) -> BandWithId:
         raise HTTPException(status_code=404, detail='band not found')
     return band
 
+
 @app.get('/bands/genre/{genre}', status_code=200)
 async def band_for_genre(genre: GenreURLChoices) -> list[dict]:
     return [
         b for b in Bands if b['genre'].lower() == genre.value
-    ]  
+    ]
 
 
 @app.post('/bands', status_code=200)

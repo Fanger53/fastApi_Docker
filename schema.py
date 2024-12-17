@@ -43,4 +43,3 @@ class BandCreate(BandBase):
 
 class BandWithId(BandBase):
     id: int
-
