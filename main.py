@@ -1,5 +1,7 @@
-from fastapi import FastAPI, HTTPException
-from schema import GenreURLChoices, Band, BandCreate, BandWithId
+from fastapi import FastAPI, HTTPException, Path, Query
+from schema import GenreURLChoices, BandCreate, BandWithId
+from typing import Annotated
+
 
 app = FastAPI()
 
@@ -13,17 +15,27 @@ Bands = [
 
 
 @app.get('/bands')
-async def bands(genre: GenreURLChoices | None = None) -> list[Band]:
-    band_list = [Band(**b) for b in Bands]
+async def bands(
+    genre: GenreURLChoices | None = None,
+    q: Annotated[str | None, Query(max_length=10)] = None,
+) -> list[BandWithId]:
+    band_list = [BandWithId(**b) for b in Bands]
     if genre:
         return [
             b for b in band_list if b.genre.value.lower() == genre.value
+        ]
+    
+    if q:
+        band_list = [
+            b for b in band_list if q.lower() in b.name.lower()
         ]
     return band_list
 
 
 @app.get('/bands/{band_id}', status_code=200)
-async def band(band_id: int) -> BandWithId:
+async def band(
+    band_id: Annotated[int,
+    Path(title='the band id')]) -> BandWithId:
     band = next((BandWithId(**b) for b in Bands if b['id'] == band_id), None)
     if band is None:
         # status 404
